@@ -24,6 +24,18 @@ For **each** `.scad` file in the project, the README must display two images:
 - Background: Transparent or neutral gray
 - Naming convention: `<scad_filename>_front.png` and `<scad_filename>_rear.png`
 
+### Camera Settings
+
+OpenSCAD camera parameter format: `--camera=translateX,translateY,translateZ,rotX,rotY,rotZ,distance`
+
+**Important**: The camera must be centered on the model's bounding box center, not the origin. Use `--autocenter --viewall` flags to automatically frame the entire model.
+
+Camera angles:
+- **Front view**: `rotX=55, rotY=0, rotZ=45` (looking from front-right-above)
+- **Rear view**: `rotX=55, rotY=0, rotZ=225` (looking from back-left-above)
+
+The `--autocenter` flag centers the model at the origin before rendering, and `--viewall` adjusts the camera distance to fit the entire model in frame.
+
 ### README Structure
 
 ```markdown
@@ -441,9 +453,12 @@ Both scripts must:
 ### Script Requirements
 
 - Use OpenSCAD command-line interface
-- Camera angles for images:
-  - Front view: `--camera=0,0,0,45,0,45,500`
-  - Rear view: `--camera=0,0,0,45,0,225,500`
+- Camera settings for images:
+  - Use `--autocenter` to center the model at origin before rendering
+  - Use `--viewall` to automatically fit the entire model in frame
+  - Front view: `--camera=0,0,0,55,0,45,0` (rotX=55, rotY=0, rotZ=45)
+  - Rear view: `--camera=0,0,0,55,0,225,0` (rotX=55, rotY=0, rotZ=225)
+  - Note: With `--viewall`, the distance parameter (last value) is ignored
 - Image size: `--imgsize=800,600`
 - Output format: `--export-format=binstl` for STL files
 

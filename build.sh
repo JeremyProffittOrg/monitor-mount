@@ -13,10 +13,11 @@ IMG_WIDTH=800
 IMG_HEIGHT=600
 
 # Camera settings for views (translate_x,y,z, rot_x,y,z, distance)
-# Front view: 45° elevation, 45° azimuth
-CAMERA_FRONT="0,0,0,55,0,45,500"
-# Rear view: 45° elevation, 225° azimuth (opposite side)
-CAMERA_REAR="0,0,0,55,0,225,500"
+# Using --autocenter and --viewall to automatically fit entire model
+# Front view: 55° elevation, 45° azimuth
+CAMERA_FRONT="0,0,0,55,0,45,0"
+# Rear view: 55° elevation, 225° azimuth (opposite side)
+CAMERA_REAR="0,0,0,55,0,225,0"
 
 # Colors
 RED='\033[0;31m'
@@ -75,6 +76,7 @@ generate_images() {
 
     info "Generating front view: $front_img"
     "$OPENSCAD" -o "$front_img" \
+        --autocenter --viewall \
         --camera="$CAMERA_FRONT" \
         --imgsize="$IMG_WIDTH,$IMG_HEIGHT" \
         --colorscheme="Tomorrow Night" \
@@ -82,6 +84,7 @@ generate_images() {
 
     info "Generating rear view: $rear_img"
     "$OPENSCAD" -o "$rear_img" \
+        --autocenter --viewall \
         --camera="$CAMERA_REAR" \
         --imgsize="$IMG_WIDTH,$IMG_HEIGHT" \
         --colorscheme="Tomorrow Night" \

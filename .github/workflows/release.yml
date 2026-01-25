@@ -32,8 +32,10 @@ jobs:
           # Configuration
           IMG_WIDTH=800
           IMG_HEIGHT=600
-          CAMERA_FRONT="0,0,0,55,0,45,500"
-          CAMERA_REAR="0,0,0,55,0,225,500"
+          # Camera angles: rotX=55, rotY=0, rotZ=45 for front, rotZ=225 for rear
+          # Using --autocenter and --viewall to automatically fit entire model
+          CAMERA_FRONT="0,0,0,55,0,45,0"
+          CAMERA_REAR="0,0,0,55,0,225,0"
 
           # Find and process all .scad files
           find . -name "*.scad" -not -path "./lib/*" -not -path "./include/*" -not -path "./build/*" | while read scad_file; do
@@ -44,17 +46,19 @@ jobs:
             echo "  Generating STL..."
             xvfb-run -a openscad -o "build/${base_name}.stl" "$scad_file"
 
-            # Generate front view
+            # Generate front view (with autocenter and viewall to fit entire model)
             echo "  Generating front view..."
             xvfb-run -a openscad -o "build/${base_name}_front.png" \
+              --autocenter --viewall \
               --camera="$CAMERA_FRONT" \
               --imgsize="$IMG_WIDTH,$IMG_HEIGHT" \
               --colorscheme="Tomorrow Night" \
               "$scad_file"
 
-            # Generate rear view
+            # Generate rear view (with autocenter and viewall to fit entire model)
             echo "  Generating rear view..."
             xvfb-run -a openscad -o "build/${base_name}_rear.png" \
+              --autocenter --viewall \
               --camera="$CAMERA_REAR" \
               --imgsize="$IMG_WIDTH,$IMG_HEIGHT" \
               --colorscheme="Tomorrow Night" \

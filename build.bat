@@ -10,10 +10,11 @@ set IMG_WIDTH=800
 set IMG_HEIGHT=600
 
 REM Camera settings for views (translate_x,y,z, rot_x,y,z, distance)
-REM Front view: 45 elevation, 45 azimuth
-set CAMERA_FRONT=0,0,0,55,0,45,500
-REM Rear view: 45 elevation, 225 azimuth (opposite side)
-set CAMERA_REAR=0,0,0,55,0,225,500
+REM Using --autocenter and --viewall to automatically fit entire model
+REM Front view: 55 elevation, 45 azimuth
+set CAMERA_FRONT=0,0,0,55,0,45,0
+REM Rear view: 55 elevation, 225 azimuth (opposite side)
+set CAMERA_REAR=0,0,0,55,0,225,0
 
 REM Find OpenSCAD
 set OPENSCAD=
@@ -85,14 +86,14 @@ if errorlevel 1 (
 )
 
 echo [INFO] Generating front view: %FRONT_IMG%
-"%OPENSCAD%" -o "%FRONT_IMG%" --camera=%CAMERA_FRONT% --imgsize=%IMG_WIDTH%,%IMG_HEIGHT% --colorscheme="Tomorrow Night" "%SCAD_FILE%"
+"%OPENSCAD%" -o "%FRONT_IMG%" --autocenter --viewall --camera=%CAMERA_FRONT% --imgsize=%IMG_WIDTH%,%IMG_HEIGHT% --colorscheme="Tomorrow Night" "%SCAD_FILE%"
 if errorlevel 1 (
     echo [ERROR] Failed to generate front image for %SCAD_FILE%
     exit /b 1
 )
 
 echo [INFO] Generating rear view: %REAR_IMG%
-"%OPENSCAD%" -o "%REAR_IMG%" --camera=%CAMERA_REAR% --imgsize=%IMG_WIDTH%,%IMG_HEIGHT% --colorscheme="Tomorrow Night" "%SCAD_FILE%"
+"%OPENSCAD%" -o "%REAR_IMG%" --autocenter --viewall --camera=%CAMERA_REAR% --imgsize=%IMG_WIDTH%,%IMG_HEIGHT% --colorscheme="Tomorrow Night" "%SCAD_FILE%"
 if errorlevel 1 (
     echo [ERROR] Failed to generate rear image for %SCAD_FILE%
     exit /b 1
