@@ -1,0 +1,23 @@
+# Generated build artifacts
+build/
+*.stl
+*.png
+
+# OpenSCAD backup files
+*.scad~
+*.scad.bak
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Exception: Keep source images if any exist in assets/
+!assets/*.png

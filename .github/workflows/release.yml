@@ -1,0 +1,114 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag name for the release (e.g., v1.0.0)'
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install OpenSCAD
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openscad xvfb
+
+      - name: Create build directory
+        run: mkdir -p build
+
+      - name: Build STL and PNG files
+        run: |
+          # Configuration
+          IMG_WIDTH=800
+          IMG_HEIGHT=600
+          CAMERA_FRONT="0,0,0,55,0,45,500"
+          CAMERA_REAR="0,0,0,55,0,225,500"
+
+          # Find and process all .scad files
+          find . -name "*.scad" -not -path "./lib/*" -not -path "./include/*" -not -path "./build/*" | while read scad_file; do
+            base_name=$(basename "$scad_file" .scad)
+            echo "Processing: $scad_file"
+
+            # Generate STL
+            echo "  Generating STL..."
+            xvfb-run -a openscad -o "build/${base_name}.stl" "$scad_file"
+
+            # Generate front view
+            echo "  Generating front view..."
+            xvfb-run -a openscad -o "build/${base_name}_front.png" \
+              --camera="$CAMERA_FRONT" \
+              --imgsize="$IMG_WIDTH,$IMG_HEIGHT" \
+              --colorscheme="Tomorrow Night" \
+              "$scad_file"
+
+            # Generate rear view
+            echo "  Generating rear view..."
+            xvfb-run -a openscad -o "build/${base_name}_rear.png" \
+              --camera="$CAMERA_REAR" \
+              --imgsize="$IMG_WIDTH,$IMG_HEIGHT" \
+              --colorscheme="Tomorrow Night" \
+              "$scad_file"
+          done
+
+      - name: List generated files
+        run: ls -la build/
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: build/
+          retention-days: 5
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: build/
+
+      - name: Determine tag name
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ inputs.tag_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: Release ${{ steps.tag.outputs.tag }}
+          body: |
+            ## Downloads
+
+            This release includes:
+            - STL files for 3D printing
+            - PNG preview images (front and rear views)
+
+            ### Files
+            See assets below for all generated files.
+          files: build/*
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
