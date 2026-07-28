@@ -1,3 +1,8 @@
+---
+description: Commit all changes, push, and watch the GitHub Actions pipeline to a terminal result
+allowed-tools: ["Bash", "Read", "Edit", "Glob", "Grep"]
+---
+
 # Git Push Workflow
 
 Execute the following workflow to commit, push, and validate the release.
